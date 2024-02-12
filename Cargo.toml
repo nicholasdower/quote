@@ -1,0 +1,11 @@
+# See https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[package]
+name = "quote"
+version = "1.0.0"
+edition = "2021"
+authors = ["Nick Dower <nicholasdower@gmail.com>"]
+
+[dependencies]
+clap = { version = "4.0", features = ["derive"] }
+atty = "0.2"
