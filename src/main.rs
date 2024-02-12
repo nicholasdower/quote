@@ -66,7 +66,7 @@ fn run() -> Result<(), String> {
         println!("{HELP}");
         Ok(())
     } else if args.version {
-        println!("{VERSION}");
+        println!("quote {VERSION}");
         Ok(())
     } else if args.quote.is_some() {
         if args.start.is_some() || args.end.is_some() {
