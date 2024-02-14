@@ -6,9 +6,25 @@ else
   dir="$RUNNER_TEMP/quote"
 fi
 
+if [ $# -gt 1 ]; then
+  echo "usage: $0 [<bin-path>]" >&2
+  exit 1
+fi
+
+if [ $# -eq 1 ]; then
+  binary="$1/quote"
+else
+  binary="./target/debug/quote"
+fi
+
+if [ ! -f "$binary" ]; then
+  echo "error: $binary does not exist" >&2
+  exit 1
+fi
+
 rm -rf "$dir"
 mkdir -p "$dir"
-cp ./target/release/quote "$dir"
+cp "$binary" "$dir"
 cd "$dir"
 
 function test() {

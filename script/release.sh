@@ -9,35 +9,43 @@ if [ $# -ne 1 ]; then
   exit 1
 fi
 
+if [ -z "${HOMEBREW_PAT}" ]; then
+  echo "HOMEBREW_PAT not set" >&2
+  exit 1
+fi
+
+if [ -z "${GH_TOKEN}" ]; then
+  echo "GH_TOKEN not set" >&2
+  exit 1
+fi
+
 version="$1"
 
 echo "Set version to $version"
-sed -i '' "s/^version = .*/version = \"$version\"/g" Cargo.toml
-
-echo "Build"
-rm -rf target
-cargo build --release
-
-echo "Lint"
-cargo clippy -- -Dwarnings
-
-echo "Test"
-RUNNER_TEMP=/tmp ./script/test.sh
-
-rm -rf bin
-mkdir -p bin
-cp ./target/release/quote bin/
+./script/version.sh "$version"
 
 echo "Create man page"
 ./script/manpage.sh "$version" "$(date '+%Y-%m-%d')"
 
-echo "Create release.tar.gz"
-file="release.tar.gz"
-rm -f "$file"
-tar -czf "$file" ./man/ ./bin/
+x86_64_apple_darwin_file="quote-$version-x86_64-apple-darwin.tar.gz"
+aarch64_apple_darwin_file="quote-$version-aarch64-apple-darwin.tar.gz"
+
+echo "Create $x86_64_apple_darwin_file"
+rm -rf bin
+mkdir -p bin
+mv quote-x86_64-apple-darwin bin/quote
+rm -f "$x86_64_apple_darwin_file"
+tar -czf "$x86_64_apple_darwin_file" ./man/ ./bin/
+
+echo "Create $aarch64_apple_darwin_file"
+rm -rf bin
+mkdir -p bin
+mv quote-aarch64-apple-darwin bin/quote
+rm -f "$aarch64_apple_darwin_file"
+tar -czf "$aarch64_apple_darwin_file" ./man/ ./bin/
 
 echo "Create Homebrew formula"
-./script/homebrew.sh "$version" "$file"
+./script/homebrew.sh "$version"
 
 echo "Update CHANGELOG.md"
 ./script/changelog.sh "$version"
@@ -45,26 +53,41 @@ echo "Update CHANGELOG.md"
 echo "Update README.md"
 ./script/readme.sh
 
+git config user.email "nicholasdower@gmail.com"
+git config user.name "quote-ci"
+
 echo "Commit changes"
-git add .
-echo -e "v$version Release\n\n$(cat .release-notes)" | git commit -a -F -
+git add CHANGELOG.md
+git add Cargo.lock
+git add Cargo.toml
+git add Formula/quote.rb
+git add README.md
+git add man/quote.1
+echo -e "v$version Release\n\n$(cat .release-notes)" | git commit -F -
 
 echo "Add tag v$version"
 git tag "v$version"
 
-echo "Reset .release-notes"
 mkdir -p tmp
 cp .release-notes tmp/
 echo "- No changes" > .release-notes
-git add .release-notes
-git commit -a -m 'Post release'
+
+if ! `git diff --exit-code .release-notes > /dev/null 2>&1`; then
+  echo "Reset .release-notes"
+  git add .release-notes
+  git commit -m 'Post release'
+fi
 
 echo "Push changes"
 git push origin master
 git push origin "v$version"
 
 echo "Create release"
-gh release create "v$version" "$file" -R nicholasdower/quote --notes-file tmp/.release-notes
+gh release create "v$version" \
+  "$x86_64_apple_darwin_file" \
+  "$aarch64_apple_darwin_file" \
+  -R nicholasdower/quote \
+  --notes-file tmp/.release-notes
 
 echo "Trigger Homebrew update"
-gh workflow run update.yml --ref master -R nicholasdower/homebrew-tap
+GH_TOKEN=$HOMEBREW_PAT gh workflow run update.yml --ref master -R nicholasdower/homebrew-tap

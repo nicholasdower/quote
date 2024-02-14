@@ -12,14 +12,4 @@ Options
     -e, --end        The ending quote character.
     -h, --help       Print help.
     -v, --version    Print version.
-
-Installation
-
-    Install:
-
-        brew install nicholasdower/tap/quote
-
-    Uninstall:
-
-        brew uninstall quote
 ```
