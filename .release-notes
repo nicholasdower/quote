@@ -1,1 +1,2 @@
-- No changes
+- Remove support for quoting files.
+- Use commandline args rather than flags.
