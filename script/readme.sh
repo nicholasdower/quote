@@ -4,7 +4,7 @@ set -e
 set -u
 set -o pipefail
 
-if [ $# -gt 2 ]; then
+if [ $# -ne 2 ]; then
   echo "usage: $0 <bin-dir> <binary>" >&2
   exit 1
 fi
@@ -37,6 +37,6 @@ brew uninstall $binary
 ## Help
 
 \`\`\`
-$($binary -h)
+$($binary_path -h)
 \`\`\`
 EOF
