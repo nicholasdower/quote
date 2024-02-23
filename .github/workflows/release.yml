@@ -6,8 +6,8 @@ on:
         type: string
         description: 'Version'
 jobs:
-  build-x86_64-apple-darwin:
-    name: Build (x86_64-apple-darwin)
+  build-macos-13-x86_64-apple-darwin:
+    name: Build (macOS 13, x86_64-apple-darwin)
     runs-on: macos-13
     timeout-minutes: 5
     steps:
@@ -22,14 +22,14 @@ jobs:
       - name: Test
         run: ./script/test.sh target/x86_64-apple-darwin/release
       - name: Rename
-        run: mv target/x86_64-apple-darwin/release/quote quote-x86_64-apple-darwin
+        run: mv target/x86_64-apple-darwin/release/quote quote-macos-13-x86_64-apple-darwin
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: quote-x86_64-apple-darwin
-          path: quote-x86_64-apple-darwin
-  build-aarch64-apple-darwin:
-    name: Build (aarch64-apple-darwin)
+          name: quote-macos-13-x86_64-apple-darwin
+          path: quote-macos-13-x86_64-apple-darwin
+  build-macos-14-aarch64-apple-darwin:
+    name: Build (macOS 14, aarch64-apple-darwin)
     runs-on: macos-14
     timeout-minutes: 5
     steps:
@@ -44,28 +44,28 @@ jobs:
       - name: Test
         run: ./script/test.sh target/aarch64-apple-darwin/release
       - name: Rename
-        run: mv target/aarch64-apple-darwin/release/quote quote-aarch64-apple-darwin
+        run: mv target/aarch64-apple-darwin/release/quote quote-macos-14-aarch64-apple-darwin
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: quote-aarch64-apple-darwin
-          path: quote-aarch64-apple-darwin
+          name: quote-macos-14-aarch64-apple-darwin
+          path: quote-macos-14-aarch64-apple-darwin
   release:
     name: Release
     needs:
-      - build-x86_64-apple-darwin
-      - build-aarch64-apple-darwin
+      - build-macos-13-x86_64-apple-darwin
+      - build-macos-14-aarch64-apple-darwin
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Download (x86_64-apple-darwin)
+      - name: Download (macOS 13, x86_64-apple-darwin)
         uses: actions/download-artifact@v4
         with:
-          name: quote-x86_64-apple-darwin
-      - name: Download (aarch64-apple-darwin)
+          name: quote-macos-13-x86_64-apple-darwin
+      - name: Download (macOS 14, aarch64-apple-darwin)
         uses: actions/download-artifact@v4
         with:
-          name: quote-aarch64-apple-darwin
+          name: quote-macos-14-aarch64-apple-darwin
       - name: Set Version
         run: ./script/version.sh ${{ inputs.version }}
       - name: Build
@@ -76,4 +76,4 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           HOMEBREW_PAT: ${{ secrets.HOMEBREW_PAT }}
-        run: ./script/release.sh ${{ inputs.version }}
+        run: ./script/release.sh quote ${{ inputs.version }} "Quote lines"

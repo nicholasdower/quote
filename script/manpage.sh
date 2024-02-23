@@ -17,7 +17,7 @@ mkdir man
 cat << EOF > man/quote.1
 .TH QUOTE 1 $date $version ""
 .SH NAME
-\fBquote\fR \- Join lines
+\fBquote\fR \- Quote lines
 .SH SYNOPSIS
 \fBquote\fR ([\fB-q\fR \fI<quote>\fR] | [\fB-s\fR \fI<start>\fR] [\fB-e\fR \fI<end>\fR]) [\fI<file> \.\.\.\fR]
 .SH DESCRIPTION

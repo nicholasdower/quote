@@ -1,5 +1,4 @@
 /target
-/bin
+/quote*.tar.gz
 /tmp
-/release.tar.gz
 /.DS_Store
