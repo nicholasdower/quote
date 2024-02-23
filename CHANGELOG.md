@@ -1,3 +1,8 @@
+## 3.0.0
+
+- Remove support for quoting files.
+- Use commandline args rather than flags.
+
 ## 2.0.0
 
 - No changes
