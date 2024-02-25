@@ -16,7 +16,7 @@ Description
 Options
 
     -h, --help       Print help.
-    -v, --version    Print version.
+    -v, --version    Print version.\
 ";
 
 #[derive(Parser)]
